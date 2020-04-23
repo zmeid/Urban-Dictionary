@@ -12,7 +12,6 @@ import dagger.multibindings.IntoMap
  */
 @Module
 abstract class ViewModelsModule {
-
     @Binds
     @IntoMap
     @ViewModelKey(MainActivityViewModel::class)

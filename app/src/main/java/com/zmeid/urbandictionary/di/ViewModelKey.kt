@@ -7,7 +7,6 @@ import kotlin.reflect.KClass
 /**
  * Maps the classes to the keys.
  */
-@MustBeDocumented
 @Target(
     AnnotationTarget.FUNCTION,
     AnnotationTarget.PROPERTY_GETTER,
