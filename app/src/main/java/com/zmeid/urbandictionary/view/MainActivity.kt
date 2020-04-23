@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.lifecycle.ViewModelProvider
 import com.zmeid.urbandictionary.R
 import com.zmeid.urbandictionary.viewmodel.MainActivityViewModel
-import com.zmeid.urbandictionary.viewmodel.factory.ViewModelProviderFactory
 import dagger.android.support.DaggerAppCompatActivity
 import javax.inject.Inject
 

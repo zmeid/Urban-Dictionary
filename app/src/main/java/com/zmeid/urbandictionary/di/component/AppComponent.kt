@@ -3,6 +3,7 @@ package com.zmeid.urbandictionary.di.component
 import android.app.Application
 import com.zmeid.urbandictionary.BaseApplication
 import com.zmeid.urbandictionary.di.module.ActivityBuildersModule
+import com.zmeid.urbandictionary.di.module.RetrofitModule
 import com.zmeid.urbandictionary.di.module.ViewModuleFactoryModule
 import dagger.BindsInstance
 import dagger.Component
@@ -17,7 +18,8 @@ import javax.inject.Singleton
     modules = [
         AndroidSupportInjectionModule::class,
         ViewModuleFactoryModule::class,
-        ActivityBuildersModule::class
+        ActivityBuildersModule::class,
+        RetrofitModule::class
     ]
 )
 @Singleton

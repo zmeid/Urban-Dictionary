@@ -1,3 +1,3 @@
 package com.zmeid.urbandictionary.util
 
-const val BASE_URL = "XXXX" //TODO set the base url
+const val BASE_URL = "https://XXXX" //TODO set the base url
