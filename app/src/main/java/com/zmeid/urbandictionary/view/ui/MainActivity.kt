@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
-class MainActivity : BaseActivity(), SearchViewOnQueryTextChangedListener {
+class MainActivity : BaseActivity(), SearchViewOnQueryTextChangedListener, View.OnClickListener {
 
     @Inject
     lateinit var viewModelProviderFactory: ViewModelProvider.Factory
@@ -65,10 +65,12 @@ class MainActivity : BaseActivity(), SearchViewOnQueryTextChangedListener {
             ApiResponseWrapper.Status.LOADING -> {
                 showProgressBar(binding.progressBarMainActivity)
                 hideUserMessageText()
+                hideRetryButton()
             }
             ApiResponseWrapper.Status.SUCCESS -> {
                 hideProgressBar(binding.progressBarMainActivity)
                 hideUserMessageText()
+                hideRetryButton()
                 val urbanList = apiResponseWrapper.data!!.urbanList
                 urbanAdapter.submitList(urbanList)
                 if (urbanList.isEmpty()) showUserMessage(getString(R.string.nothing_found))
@@ -76,7 +78,9 @@ class MainActivity : BaseActivity(), SearchViewOnQueryTextChangedListener {
             ApiResponseWrapper.Status.ERROR -> {
                 hideProgressBar(binding.progressBarMainActivity)
                 val errorMessage = apiErrorMessageGenerator.generateErrorMessage(apiResponseWrapper.exception!!)
+                urbanAdapter.submitList(null)
                 showUserMessage(errorMessage)
+                showRetryButton()
             }
         }
     }
@@ -88,6 +92,8 @@ class MainActivity : BaseActivity(), SearchViewOnQueryTextChangedListener {
 
         binding.recyclerviewUrbanResults.layoutManager = layoutManager
         binding.recyclerviewUrbanResults.adapter = urbanAdapter
+
+        binding.buttonRetry.setOnClickListener(this)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -137,5 +143,21 @@ class MainActivity : BaseActivity(), SearchViewOnQueryTextChangedListener {
 
     private fun hideUserMessageText() {
         binding.textViewUserMessage.visibility = View.GONE
+    }
+
+    private fun showRetryButton() {
+        binding.buttonRetry.visibility = View.VISIBLE
+    }
+
+    private fun hideRetryButton() {
+        binding.buttonRetry.visibility = View.GONE
+    }
+
+    override fun onClick(v: View?) {
+        when (v?.id) {
+            binding.buttonRetry.id -> {
+                mainActivityViewModel.searchDefinition(wordToSearch, true)
+            }
+        }
     }
 }

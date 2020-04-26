@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Urban Dictionary</string>
     <string name="search">Search</string>
+    <string name="retry">Retry</string>
     <string name="search_view_query_hint">Type to search…</string>
     <string name="type_to_get_definitions">Type to get definitions</string>
 
