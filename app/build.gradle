@@ -13,11 +13,19 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField "String", "API_HOST", "\"mashape-community-urban-dictionary.p.rapidapi.com\""
+    }
+    viewBinding {
+        enabled = true
     }
     buildTypes {
+        debug {
+            buildConfigField "String", "API_KEY", "\"5dbe58b2e3mshff0f7a1dcd6536cp14eddfjsn3c548c9a6807\""
+        }
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField 'String', 'API_KEY', "TBD"
         }
     }
 }
@@ -33,22 +41,36 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
-    // Dagger2
+    // region Dagger2
     kapt "com.google.dagger:dagger-compiler:$daggerVersion"
     kapt "com.google.dagger:dagger-android-processor:$daggerVersion"
     implementation "com.google.dagger:dagger:$daggerVersion"
     implementation "com.google.dagger:dagger-android:$daggerVersion"
     implementation "com.google.dagger:dagger-android-support:$daggerVersion"
+    // endregion
 
-    // LifeCycle
+    // region LifeCycle
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion"
+    // endregion
 
-    // Retrofit
+    // region Retrofit
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+    implementation "com.squareup.okhttp3:logging-interceptor:$okhttp_version"
+    // endregion
 
-    // Recyclerview
+    // region Recyclerview
     implementation "androidx.recyclerview:recyclerview:$recyclerview_version"
+    // endregion
+
+    // region Timber
+    implementation "com.jakewharton.timber:timber:$timber_version"
+    // endRegion
+
+    // region CardView
+    implementation "androidx.cardview:cardview:$cardview_version"
+    // end region
 }

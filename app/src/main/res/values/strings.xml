@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">Urban Dictionary</string>
+    <string name="search">Search</string>
+    <string name="search_view_query_hint">Type to search…</string>
+    <string name="type_to_get_definitions">Type to get definitions</string>
+
+    <!-- region searchErrors -->
+    <string name="nothing_found">We couldn\'t find any definition :(</string>
+    <string name="search_there_is_an_error">There is an error :( \n {%1$s!}</string>
+    <string name="no_internet_error">I can\'t reach the host. Are you connected to internet?</string>
+    <string name="search_unauthorized_error">You are unauthorized to make API calls. Do you have correct API key?</string>
+    <string name="search_http_404_not_found_error">I can\'t find the URL. Are API-Url and API-Host correct? </string>
+    <!-- endregion -->
 </resources>

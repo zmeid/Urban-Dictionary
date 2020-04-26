@@ -2,9 +2,7 @@ package com.zmeid.urbandictionary.di.component
 
 import android.app.Application
 import com.zmeid.urbandictionary.BaseApplication
-import com.zmeid.urbandictionary.di.module.ActivityBuildersModule
-import com.zmeid.urbandictionary.di.module.RetrofitModule
-import com.zmeid.urbandictionary.di.module.ViewModuleFactoryModule
+import com.zmeid.urbandictionary.di.module.*
 import dagger.BindsInstance
 import dagger.Component
 import dagger.android.AndroidInjector
@@ -19,7 +17,9 @@ import javax.inject.Singleton
         AndroidSupportInjectionModule::class,
         ViewModuleFactoryModule::class,
         ActivityBuildersModule::class,
-        RetrofitModule::class
+        WebServiceModule::class,
+        MainActivityModule::class,
+        UtilsModule::class
     ]
 )
 @Singleton
@@ -31,6 +31,4 @@ interface AppComponent : AndroidInjector<BaseApplication> {
 
         fun build(): AppComponent
     }
-
-    override fun inject(baseApplication: BaseApplication)
 }

@@ -1,6 +1,6 @@
 package com.zmeid.urbandictionary.di.module
 
-import com.zmeid.urbandictionary.view.MainActivity
+import com.zmeid.urbandictionary.view.ui.MainActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -9,6 +9,6 @@ import dagger.android.ContributesAndroidInjector
  */
 @Module
 abstract class ActivityBuildersModule {
-    @ContributesAndroidInjector(modules = [ViewModelsModule::class])
+    @ContributesAndroidInjector(modules = [ViewModelsModule::class, MainActivityModule::class, UtilsModule::class])
     abstract fun contributeMainActivity(): MainActivity
 }
