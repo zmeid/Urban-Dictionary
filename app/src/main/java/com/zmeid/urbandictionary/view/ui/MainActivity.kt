@@ -10,6 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.zmeid.urbandictionary.R
 import com.zmeid.urbandictionary.databinding.ActivityMainBinding
 import com.zmeid.urbandictionary.model.UrbanApiResponseModel
@@ -22,7 +23,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 class MainActivity : BaseActivity(), SearchViewOnQueryTextChangedListener, View.OnClickListener,
-    DialogUtils.ChoiceClickedListener {
+    DialogUtils.ChoiceClickedListener, SwipeRefreshLayout.OnRefreshListener {
 
     @Inject
     lateinit var viewModelProviderFactory: ViewModelProvider.Factory
@@ -106,6 +107,8 @@ class MainActivity : BaseActivity(), SearchViewOnQueryTextChangedListener, View.
         binding.recyclerviewUrbanResults.adapter = urbanAdapter
 
         binding.buttonRetry.setOnClickListener(this)
+
+        binding.swipeRefreshLayout.setOnRefreshListener(this)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -137,15 +140,16 @@ class MainActivity : BaseActivity(), SearchViewOnQueryTextChangedListener, View.
         mainActivityViewModel.urbanLastSearchWord.observeOnce(this, Observer {
             searchViewMenuItem.expandActionView()
             searchViewMenu.setQuery(it, false)
+            wordToSearch = it
         })
     }
 
     override fun onQueryTextChange(word: String): Boolean {
-        wordToSearch = word
         searchQueryDelayJob?.cancel()
         searchQueryDelayJob = lifecycleScope.launch {
             delay(700)
-            if (wordToSearch.isNotEmpty()) {
+            if (word.isNotEmpty()) {
+                wordToSearch = word
                 mainActivityViewModel.searchDefinition(wordToSearch, false)
             } else if (urbanAdapter.itemCount == 0) {
                 withContext(Dispatchers.Main) {
@@ -190,5 +194,10 @@ class MainActivity : BaseActivity(), SearchViewOnQueryTextChangedListener, View.
 
     override fun choiceClicked(shouldSortByThumbsUp: Boolean) {
         mainActivityViewModel.sortDefinitionResults(shouldSortByThumbsUp)
+    }
+
+    override fun onRefresh() {
+        if (wordToSearch.isNotEmpty()) mainActivityViewModel.searchDefinition(wordToSearch, true)
+        binding.swipeRefreshLayout.isRefreshing = false
     }
 }

@@ -35,16 +35,16 @@ class MainActivityViewModel @Inject constructor(
      */
     fun searchDefinition(word: String, forceRefresh: Boolean) {
         if (forceRefresh || word != urbanLastSearchWordMutable.value) {
-            getDefinition(word)
+            getDefinition(word, forceRefresh)
             urbanLastSearchWordMutable.value = word
         }
     }
 
-    private fun getDefinition(word: String) {
+    private fun getDefinition(word: String, forceRefresh: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             urbanDefinitionResultMutable.postValue(ApiResponseWrapper.loading())
             try {
-                urbanList = urbanRepository.getDefinitions(word)
+                urbanList = urbanRepository.getDefinitions(word, forceRefresh)
                 sortDefinitionResults(shouldSortByThumbsUp)
             } catch (e: Exception) {
                 urbanDefinitionResultMutable.postValue(ApiResponseWrapper.error(exception = e))

@@ -90,4 +90,8 @@ dependencies {
     // Test helpers
     testImplementation "androidx.room:room-testing:$room_version"
     //end region
+
+    // region SwipeToRefresh
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swipe_to_refresh_version"
+    // endregion
 }

@@ -12,14 +12,21 @@ class UrbanRepository @Inject constructor(private val urbanService: UrbanService
         urbanDao.insertAll(urbanList)
     }
 
-    suspend fun getDefinitions(word: String): List<Urban> {
-        var urbanList = urbanDao.getDefinition(word)
+    /**
+     * If the date is already in database, simply return
+     */
+    suspend fun getDefinitions(word: String, forceRefresh: Boolean): List<Urban> {
 
-        if (urbanList.isEmpty()) {
-            // if database has no definitions, fetch the API and insert result to database.
-            urbanList = urbanService.getDefinition(word).urbanList
-            insertDefinitionsToDatabase(urbanList, word)
-        }
+        if (forceRefresh) return getDefinitionsFromApiAndInsertToDatabase(word)
+
+        val urbanList = urbanDao.getDefinition(word)
+
+        return if (urbanList.isEmpty()) getDefinitionsFromApiAndInsertToDatabase(word) else urbanList
+    }
+
+    private suspend fun getDefinitionsFromApiAndInsertToDatabase(word: String): List<Urban> {
+        val urbanList = urbanService.getDefinition(word).urbanList
+        insertDefinitionsToDatabase(urbanList, word)
         return urbanList
     }
 }
