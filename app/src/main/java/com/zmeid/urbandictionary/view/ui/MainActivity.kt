@@ -1,5 +1,6 @@
 package com.zmeid.urbandictionary.view.ui
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -12,20 +13,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.zmeid.urbandictionary.R
 import com.zmeid.urbandictionary.databinding.ActivityMainBinding
 import com.zmeid.urbandictionary.model.UrbanApiResponseModel
-import com.zmeid.urbandictionary.util.ApiErrorMessageGenerator
-import com.zmeid.urbandictionary.util.ApiResponseWrapper
-import com.zmeid.urbandictionary.util.StringTrimDelegate
-import com.zmeid.urbandictionary.util.observeOnce
+import com.zmeid.urbandictionary.util.*
 import com.zmeid.urbandictionary.view.adapter.UrbanAdapter
 import com.zmeid.urbandictionary.view.interfaces.SearchViewOnQueryTextChangedListener
 import com.zmeid.urbandictionary.viewmodel.MainActivityViewModel
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import timber.log.Timber
 import javax.inject.Inject
 
-class MainActivity : BaseActivity(), SearchViewOnQueryTextChangedListener, View.OnClickListener {
+class MainActivity : BaseActivity(), SearchViewOnQueryTextChangedListener, View.OnClickListener,
+    DialogUtils.ChoiceClickedListener {
 
     @Inject
     lateinit var viewModelProviderFactory: ViewModelProvider.Factory
@@ -39,18 +36,33 @@ class MainActivity : BaseActivity(), SearchViewOnQueryTextChangedListener, View.
     @Inject
     lateinit var apiErrorMessageGenerator: ApiErrorMessageGenerator
 
+    @Inject
+    lateinit var dialogUtils: DialogUtils
+
     private lateinit var binding: ActivityMainBinding
     private lateinit var mainActivityViewModel: MainActivityViewModel
     private var searchQueryDelayJob: Job? = null
     private lateinit var searchViewMenu: SearchView
     private lateinit var searchViewMenuItem: MenuItem
     private var wordToSearch: String by StringTrimDelegate()
+    private var sortingPrefDialog: AlertDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         mainActivityViewModel = ViewModelProvider(this, viewModelProviderFactory).get(MainActivityViewModel::class.java)
         observeUrbanDefinitionResult()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(SORTING_PREF_DIALOG_IS_SHOWING_TAG, sortingPrefDialog?.isShowing ?: false)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        val isSortPrefDialogShowing = savedInstanceState.getBoolean(SORTING_PREF_DIALOG_IS_SHOWING_TAG, false)
+        if (isSortPrefDialogShowing) showSortingPrefDialog()
     }
 
     private fun observeUrbanDefinitionResult() {
@@ -102,6 +114,16 @@ class MainActivity : BaseActivity(), SearchViewOnQueryTextChangedListener, View.
         return super.onCreateOptionsMenu(menu)
     }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_sort -> {
+                showSortingPrefDialog()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
     private fun initSearchMenu(menu: Menu) {
         searchViewMenuItem = menu.findItem(R.id.menu_search)
         searchViewMenu = searchViewMenuItem.actionView as SearchView
@@ -126,7 +148,7 @@ class MainActivity : BaseActivity(), SearchViewOnQueryTextChangedListener, View.
             if (wordToSearch.isNotEmpty()) {
                 mainActivityViewModel.searchDefinition(wordToSearch, false)
             } else if (urbanAdapter.itemCount == 0) {
-                runOnUiThread {
+                withContext(Dispatchers.Main) {
                     showUserMessage(getString(R.string.type_to_get_definitions))
                 }
             }
@@ -159,5 +181,14 @@ class MainActivity : BaseActivity(), SearchViewOnQueryTextChangedListener, View.
                 mainActivityViewModel.searchDefinition(wordToSearch, true)
             }
         }
+    }
+
+    private fun showSortingPrefDialog() {
+        sortingPrefDialog = dialogUtils.createSortingPrefDialog()
+        sortingPrefDialog?.show()
+    }
+
+    override fun choiceClicked(shouldSortByThumbsUp: Boolean) {
+        mainActivityViewModel.sortDefinitionResults(shouldSortByThumbsUp)
     }
 }

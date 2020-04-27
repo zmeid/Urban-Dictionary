@@ -8,7 +8,7 @@ import dagger.android.ContributesAndroidInjector
  * Defines activities where dependencies are going to be injected.
  */
 @Module
-abstract class ActivityBuildersModule {
+abstract class ActivitiesModule {
     @ContributesAndroidInjector(modules = [ViewModelsModule::class, MainActivityModule::class, UtilsModule::class])
     abstract fun contributeMainActivity(): MainActivity
 }

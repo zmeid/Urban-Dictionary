@@ -73,4 +73,12 @@ dependencies {
     // region CardView
     implementation "androidx.cardview:cardview:$cardview_version"
     // end region
+
+    // region Preference
+    implementation "androidx.preference:preference-ktx:$preference_version"
+    // end region
+
+    // region Preference
+    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakcanary_version"
+    // end region
 }
