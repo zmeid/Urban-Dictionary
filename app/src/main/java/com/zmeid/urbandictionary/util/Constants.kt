@@ -15,3 +15,7 @@ const val SHARED_PREF_SHOULD_SORT_BY_THUMBS_UP = "SHARED_PREF_SHOULD_SORT_BY_THU
 // region PrefDialog
 const val SORTING_PREF_DIALOG_IS_SHOWING_TAG = "isSortingPrefDialogShowing"
 // endregion
+
+// region Database
+const val DATABASE_NAME = "UrbanDatabase"
+// region

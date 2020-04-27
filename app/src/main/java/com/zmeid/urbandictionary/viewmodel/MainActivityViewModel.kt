@@ -35,16 +35,16 @@ class MainActivityViewModel @Inject constructor(
      */
     fun searchDefinition(word: String, forceRefresh: Boolean) {
         if (forceRefresh || word != urbanLastSearchWordMutable.value) {
-            getDefinitionFromApi(word)
+            getDefinition(word)
             urbanLastSearchWordMutable.value = word
         }
     }
 
-    private fun getDefinitionFromApi(word: String) {
+    private fun getDefinition(word: String) {
         viewModelScope.launch(Dispatchers.IO) {
             urbanDefinitionResultMutable.postValue(ApiResponseWrapper.loading())
             try {
-                urbanList = urbanRepository.getDefinition(word).urbanList
+                urbanList = urbanRepository.getDefinitions(word)
                 sortDefinitionResults(shouldSortByThumbsUp)
             } catch (e: Exception) {
                 urbanDefinitionResultMutable.postValue(ApiResponseWrapper.error(exception = e))
@@ -53,18 +53,16 @@ class MainActivityViewModel @Inject constructor(
     }
 
     fun sortDefinitionResults(shouldSortByThumbsUp: Boolean) {
-        viewModelScope.launch {
-            updateSortingPreference(shouldSortByThumbsUp)
-            if (urbanList.isNotEmpty()) {
-                urbanDefinitionResultMutable.postValue(ApiResponseWrapper.loading())
-                urbanList = if (shouldSortByThumbsUp) {
-                    urbanList.sortedByDescending { urban -> urban.thumbsUp }
-                } else {
-                    urbanList.sortedByDescending { urban -> urban.thumbsDown }
-                }
-                urbanDefinitionResultMutable.postValue(ApiResponseWrapper.success(UrbanApiResponseModel(urbanList)))
+        updateSortingPreference(shouldSortByThumbsUp)
+        if (urbanList.isNotEmpty()) {
+            urbanDefinitionResultMutable.postValue(ApiResponseWrapper.loading())
+            urbanList = if (shouldSortByThumbsUp) {
+                urbanList.sortedByDescending { urban -> urban.thumbsUp }
+            } else {
+                urbanList.sortedByDescending { urban -> urban.thumbsDown }
             }
         }
+        urbanDefinitionResultMutable.postValue(ApiResponseWrapper.success(UrbanApiResponseModel(urbanList)))
     }
 
     private fun updateSortingPreference(shouldSortByThumbsUp: Boolean) {

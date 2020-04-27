@@ -45,11 +45,10 @@
         android:id="@+id/button_retry"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
         android:text="@string/retry"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/progress_bar_main_activity" />
+        app:layout_constraintTop_toBottomOf="@+id/text_view_user_message" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

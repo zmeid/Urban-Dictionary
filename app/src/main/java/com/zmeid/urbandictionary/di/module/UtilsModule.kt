@@ -19,8 +19,8 @@ class UtilsModule {
     fun providesApiErrorMessageGenerator(context: Activity) = ApiErrorMessageGenerator(context)
 
     @Provides
-    fun providesSharedPref(context: Application): SharedPreferences =
-        PreferenceManager.getDefaultSharedPreferences(context)
+    fun providesSharedPref(appContext: Application): SharedPreferences =
+        PreferenceManager.getDefaultSharedPreferences(appContext)
 
     @Provides
     fun providesDialogUtils(activity: Activity, sharedPreferences: SharedPreferences) =

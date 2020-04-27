@@ -19,7 +19,8 @@ import javax.inject.Singleton
         ActivitiesModule::class,
         WebServiceModule::class,
         MainActivityModule::class,
-        UtilsModule::class
+        UtilsModule::class,
+        RoomModule::class
     ]
 )
 @Singleton
