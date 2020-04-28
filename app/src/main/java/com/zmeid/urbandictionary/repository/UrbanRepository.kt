@@ -8,7 +8,11 @@ import javax.inject.Inject
 class UrbanRepository @Inject constructor(private val urbanService: UrbanService, private val urbanDao: UrbanDao) {
 
     private suspend fun insertDefinitionsToDatabase(urbanList: List<Urban>, searchedWord: String) {
-        urbanList.map { urban -> urban.tag = searchedWord }
+        urbanList.map { urban ->
+            urban.tag = searchedWord
+            if (!urban.soundUrls.isNullOrEmpty()) urban.soundUrl =
+                urban.soundUrls!![0] // Only first URL to be inserted to room
+        }
         urbanDao.insertAll(urbanList)
     }
 
