@@ -12,10 +12,24 @@ const val API_HOST_HEADER_TAG = "X-RapidAPI-Host"
 const val SHARED_PREF_SHOULD_SORT_BY_THUMBS_UP = "SHARED_PREF_SHOULD_SORT_BY_THUMBS_UP"
 // endregion
 
-// region PrefDialog
+// region saveInstanceTags
 const val SORTING_PREF_DIALOG_IS_SHOWING_TAG = "isSortingPrefDialogShowing"
+const val SOUND_PLAYER_TIME_POSITION = "soundPlayerTimePosition"
+const val SOUND_PLAYER_URL = "soundPlayerUrl"
+const val SOUND_PLAYER_APP_NAME = "soundPlayerSampleApp"
 // endregion
 
 // region Database
 const val DATABASE_NAME = "UrbanDatabase"
+// region
+
+// region Urban serialized names
+const val SN_DEFINITION_ID = "defid"
+const val SN_WORD = "word"
+const val SN_DEFINITION = "definition"
+const val SN_EXAMPLE = "example"
+const val SN_AUTHOR = "author"
+const val SN_THUMBS_UP = "thumbs_up"
+const val SN_THUMBS_DOWN = "thumbs_down"
+const val SN_SOUND_URLS = "sound_urls"
 // region

@@ -15,6 +15,7 @@ buildscript {
         leakcanary_version = '2.2'
         room_version = '2.2.5'
         swipe_to_refresh_version = '1.0.0'
+        exo_player_version = '2.11.4'
     }
 
     repositories {

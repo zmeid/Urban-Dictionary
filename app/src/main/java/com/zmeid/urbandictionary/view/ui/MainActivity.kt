@@ -1,26 +1,36 @@
 package com.zmeid.urbandictionary.view.ui
 
 import android.app.AlertDialog
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.google.android.exoplayer2.ExoPlaybackException
+import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
 import com.zmeid.urbandictionary.R
 import com.zmeid.urbandictionary.databinding.ActivityMainBinding
 import com.zmeid.urbandictionary.model.UrbanApiResponseModel
 import com.zmeid.urbandictionary.util.*
+import com.zmeid.urbandictionary.view.adapter.OnItemClickListener
 import com.zmeid.urbandictionary.view.adapter.UrbanAdapter
 import com.zmeid.urbandictionary.view.interfaces.SearchViewOnQueryTextChangedListener
 import com.zmeid.urbandictionary.viewmodel.MainActivityViewModel
 import kotlinx.coroutines.*
 import timber.log.Timber
 import javax.inject.Inject
+
 
 class MainActivity : BaseActivity(), SearchViewOnQueryTextChangedListener, View.OnClickListener,
     DialogUtils.ChoiceClickedListener, SwipeRefreshLayout.OnRefreshListener {
@@ -40,6 +50,15 @@ class MainActivity : BaseActivity(), SearchViewOnQueryTextChangedListener, View.
     @Inject
     lateinit var dialogUtils: DialogUtils
 
+    @Inject
+    lateinit var shareTextIntent: Intent
+
+    @Inject
+    lateinit var dataSourceFactory: DefaultDataSourceFactory
+
+    @Inject
+    lateinit var simpleExoPlayer: SimpleExoPlayer
+
     private lateinit var binding: ActivityMainBinding
     private lateinit var mainActivityViewModel: MainActivityViewModel
     private var searchQueryDelayJob: Job? = null
@@ -47,23 +66,33 @@ class MainActivity : BaseActivity(), SearchViewOnQueryTextChangedListener, View.
     private lateinit var searchViewMenuItem: MenuItem
     private var wordToSearch: String by StringTrimDelegate()
     private var sortingPrefDialog: AlertDialog? = null
+    private var urbanPlaySoundUrl = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         mainActivityViewModel = ViewModelProvider(this, viewModelProviderFactory).get(MainActivityViewModel::class.java)
         observeUrbanDefinitionResult()
+        setAdapterItemClickListener()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putBoolean(SORTING_PREF_DIALOG_IS_SHOWING_TAG, sortingPrefDialog?.isShowing ?: false)
+        sortingPrefDialog?.isShowing?.let { outState.putBoolean(SORTING_PREF_DIALOG_IS_SHOWING_TAG, it) }
+        outState.putLong(SOUND_PLAYER_TIME_POSITION, simpleExoPlayer.contentPosition)
+        outState.putString(SOUND_PLAYER_URL, urbanPlaySoundUrl)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         val isSortPrefDialogShowing = savedInstanceState.getBoolean(SORTING_PREF_DIALOG_IS_SHOWING_TAG, false)
         if (isSortPrefDialogShowing) showSortingPrefDialog()
+
+        val soundTimePosition = savedInstanceState.getLong(SOUND_PLAYER_TIME_POSITION, 0L)
+        urbanPlaySoundUrl = savedInstanceState.getString(SOUND_PLAYER_URL, "")
+        if (soundTimePosition > 0 && urbanPlaySoundUrl.isNotBlank()) {
+            playUrbanSound(urbanPlaySoundUrl, soundTimePosition)
+        }
     }
 
     private fun observeUrbanDefinitionResult() {
@@ -199,5 +228,63 @@ class MainActivity : BaseActivity(), SearchViewOnQueryTextChangedListener, View.
     override fun onRefresh() {
         if (wordToSearch.isNotEmpty()) mainActivityViewModel.searchDefinition(wordToSearch, true)
         binding.swipeRefreshLayout.isRefreshing = false
+    }
+
+    private fun setAdapterItemClickListener() {
+        urbanAdapter.setOnItemClickedListener(object : OnItemClickListener {
+            override fun onShareClicked(text: String) {
+                val sendIntent = shareTextIntent.putExtra(Intent.EXTRA_TEXT, text)
+
+                if (sendIntent.resolveActivity(packageManager) != null) {
+                    startActivity(sendIntent)
+                } else {
+                    Toast.makeText(
+                        this@MainActivity,
+                        getString(R.string.no_send_text_intent_resolver),
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+
+            override fun onPlaySoundClicked(url: String) {
+                Timber.d("Play Sound Clicked Clicked: $url")
+                urbanPlaySoundUrl = url
+                playUrbanSound(url, 0L)
+            }
+        })
+    }
+
+    private fun playUrbanSound(url: String, resumeTime: Long) {
+
+        binding.urbanPlayerControlView.player = simpleExoPlayer
+        binding.urbanPlayerControlView.visibility = View.VISIBLE
+        val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(Uri.parse(url))
+        simpleExoPlayer.apply {
+            prepare(mediaSource)
+            seekTo(resumeTime)
+            playWhenReady = true
+        }
+        simpleExoPlayer.addListener(object : Player.EventListener {
+            override fun onPlayerError(error: ExoPlaybackException) {
+                Timber.e(error)
+                Toast.makeText(
+                    this@MainActivity,
+                    getString(R.string.media_player_general_error),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+
+            override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
+                if (playbackState == Player.STATE_ENDED) {
+                    urbanPlaySoundUrl = ""
+                    binding.urbanPlayerControlView.visibility = View.GONE
+                }
+            }
+        })
+    }
+
+    override fun onDestroy() {
+        simpleExoPlayer.release()
+        super.onDestroy()
     }
 }

@@ -3,6 +3,7 @@
     <string name="search">Search</string>
     <string name="search_view_query_hint">Type to search…</string>
     <string name="type_to_get_definitions">Type to get definitions</string>
+    <string name="media_player_general_error">Media Player has an error :(</string>
 
     <!-- region sortDefinitions -->
     <string name="sort_definitions">Sort Definitions</string>
@@ -18,4 +19,9 @@
     <string name="search_http_404_not_found_error">I can\'t find the URL. Are API-Url and API-Host correct? </string>
     <string name="retry">Retry</string>
     <!-- endregion -->
+
+    <!-- region searchErrors -->
+    <string name="no_send_text_intent_resolver">There is no suitable application to share!</string>
+    <!-- endregion -->
+
 </resources>

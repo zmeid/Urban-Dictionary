@@ -11,7 +11,7 @@ class UrbanRepository @Inject constructor(private val urbanService: UrbanService
         urbanList.map { urban ->
             urban.tag = searchedWord
             if (!urban.soundUrls.isNullOrEmpty()) urban.soundUrl =
-                urban.soundUrls!![0] // Only first URL to be inserted to room
+                urban.soundUrls!![0] // Only first URL to be inserted to room and to be played sound
         }
         urbanDao.insertAll(urbanList)
     }

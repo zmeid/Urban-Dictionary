@@ -8,7 +8,7 @@ android {
     buildToolsVersion "29.0.2"
     defaultConfig {
         applicationId "com.zmeid.urbandictionary"
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
@@ -27,6 +27,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField 'String', 'API_KEY', "TBD"
         }
+    }
+    compileOptions {
+        // Required for Exo Media player
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
@@ -89,9 +94,13 @@ dependencies {
     implementation "androidx.room:room-ktx:$room_version"
     // Test helpers
     testImplementation "androidx.room:room-testing:$room_version"
-    //end region
+    //endregion
 
     // region SwipeToRefresh
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:$swipe_to_refresh_version"
+    // endregion
+
+    // region Exo Player
+    implementation "com.google.android.exoplayer:exoplayer:$exo_player_version"
     // endregion
 }
