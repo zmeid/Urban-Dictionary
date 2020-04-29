@@ -5,7 +5,7 @@ import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
 /**
- * Defines activities where dependencies are going to be injected.
+ * Defines activities where dependencies are going to be injected. New activities should be added here.
  */
 @Module
 abstract class ActivitiesModule {

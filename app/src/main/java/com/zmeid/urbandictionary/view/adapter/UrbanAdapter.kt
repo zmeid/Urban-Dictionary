@@ -10,6 +10,13 @@ import com.zmeid.urbandictionary.databinding.UrbanDefinitionRowBinding
 import com.zmeid.urbandictionary.model.Urban
 import javax.inject.Inject
 
+/**
+ * Used as adapter of urban recycler view. View binding is used to bind the views.
+ *
+ * It uses Eugene W. Myers's difference algorithm to calculate the minimal number of updates to convert one list into another.
+ *
+ * It has [OnItemClickListener] to provide click listeners for share and play sound buttons.
+ */
 class UrbanAdapter @Inject constructor() :
     ListAdapter<Urban, UrbanAdapter.UrbanViewHolder>(UrbanListDiffCallback()) {
 
@@ -60,7 +67,7 @@ interface OnItemClickListener {
 
 private class UrbanListDiffCallback : DiffUtil.ItemCallback<Urban>() {
     override fun areItemsTheSame(oldItem: Urban, newItem: Urban): Boolean {
-        return false;
+        return oldItem.id == newItem.id
     }
 
     override fun areContentsTheSame(oldItem: Urban, newItem: Urban): Boolean {

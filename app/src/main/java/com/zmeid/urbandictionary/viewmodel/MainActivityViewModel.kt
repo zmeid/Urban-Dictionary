@@ -14,6 +14,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * Viewmodel of [com.zmeid.urbandictionary.view.ui.MainActivity].
+ *
+ * [UrbanRepository] and [SharedPreferences] are injected here.
+ *
+ */
 class MainActivityViewModel @Inject constructor(
     private val urbanRepository: UrbanRepository,
     private val sharedPreferences: SharedPreferences
@@ -31,7 +37,7 @@ class MainActivityViewModel @Inject constructor(
     val urbanDefinitionResult: LiveData<ApiResponseWrapper<UrbanApiResponseModel>> = urbanDefinitionResultMutable
 
     /**
-     * This is the method used by activity. If [forceRefresh] is true, TODO devam et
+     * This is the method used by activity to get definitions. If [forceRefresh] is true, definitions will be returned from API, not from database.
      */
     fun searchDefinition(word: String, forceRefresh: Boolean) {
         if (forceRefresh || word != urbanLastSearchWordMutable.value) {
@@ -40,6 +46,9 @@ class MainActivityViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Asks repository to return definitions and posts value to observers. Since it is an IO operation, it is done in [Dispatchers.IO] scope.
+     */
     private fun getDefinition(word: String, forceRefresh: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             urbanDefinitionResultMutable.postValue(ApiResponseWrapper.loading())
@@ -52,19 +61,27 @@ class MainActivityViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Sort definitions by thumbs. If [shouldSortByThumbsUp] is true, definitions are sorted by most thumbs up. If false, they are sorted by most thumbs down.
+     */
     fun sortDefinitionResults(shouldSortByThumbsUp: Boolean) {
-        updateSortingPreference(shouldSortByThumbsUp)
-        if (urbanList.isNotEmpty()) {
-            urbanDefinitionResultMutable.postValue(ApiResponseWrapper.loading())
-            urbanList = if (shouldSortByThumbsUp) {
-                urbanList.sortedByDescending { urban -> urban.thumbsUp }
-            } else {
-                urbanList.sortedByDescending { urban -> urban.thumbsDown }
+        viewModelScope.launch(Dispatchers.Default) {
+            updateSortingPreference(shouldSortByThumbsUp)
+            if (urbanList.isNotEmpty()) {
+                urbanDefinitionResultMutable.postValue(ApiResponseWrapper.loading())
+                urbanList = if (shouldSortByThumbsUp) {
+                    urbanList.sortedByDescending { urban -> urban.thumbsUp }
+                } else {
+                    urbanList.sortedByDescending { urban -> urban.thumbsDown }
+                }
             }
+            urbanDefinitionResultMutable.postValue(ApiResponseWrapper.success(UrbanApiResponseModel(urbanList)))
         }
-        urbanDefinitionResultMutable.postValue(ApiResponseWrapper.success(UrbanApiResponseModel(urbanList)))
     }
 
+    /**
+     * This method makes sure to keep sharedPreferences with the updated preference for sorting.
+     */
     private fun updateSortingPreference(shouldSortByThumbsUp: Boolean) {
         this.shouldSortByThumbsUp = shouldSortByThumbsUp
         sharedPreferences.edit().putBoolean(SHARED_PREF_SHOULD_SORT_BY_THUMBS_UP, this.shouldSortByThumbsUp).apply()

@@ -21,9 +21,11 @@ const val SOUND_PLAYER_APP_NAME = "soundPlayerSampleApp"
 
 // region Database
 const val DATABASE_NAME = "UrbanDatabase"
+const val ROOM_WORD_TAG = "tag"
 // region
 
 // region Urban serialized names
+const val SN_LIST = "list"
 const val SN_DEFINITION_ID = "defid"
 const val SN_WORD = "word"
 const val SN_DEFINITION = "definition"

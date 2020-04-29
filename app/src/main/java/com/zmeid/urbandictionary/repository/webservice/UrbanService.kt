@@ -6,6 +6,9 @@ import com.zmeid.urbandictionary.util.GET_PATH_DEFINE
 import retrofit2.http.GET
 import retrofit2.http.Query
 
+/**
+ * Holds urban service calls which will be used in [com.zmeid.urbandictionary.repository.UrbanRepository]
+ */
 interface UrbanService {
     @GET(GET_PATH_DEFINE)
     suspend fun getDefinition(@Query(DEFINE_QUERY_PARAM_TERM) term: String): UrbanApiResponseModel

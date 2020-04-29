@@ -6,7 +6,13 @@ import retrofit2.HttpException
 import timber.log.Timber
 import java.net.UnknownHostException
 
-class ApiErrorMessageGenerator constructor(private val context: Context) {
+/**
+ * This class is to be injected where error messages need to be generated.
+ */
+class ErrorMessageGenerator constructor(private val context: Context) {
+    /**
+     * Generates error messages which are going to be displayed to user based on exception received.
+     */
     fun generateErrorMessage(exception: Exception): String {
         Timber.e(exception)
         var stringResId = R.string.search_there_is_an_error

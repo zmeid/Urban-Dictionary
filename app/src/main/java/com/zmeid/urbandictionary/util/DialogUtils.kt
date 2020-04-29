@@ -10,6 +10,9 @@ import com.zmeid.urbandictionary.R
 import com.zmeid.urbandictionary.view.ui.BaseActivity
 import javax.inject.Inject
 
+/**
+ * Holds all dialog related functions. This class is lifecycle-aware. Which means, we don't have to take care of when activity life cycle changes. It will be dismissed automatically when activity is destroyed and window leak will be prevented.
+ */
 class DialogUtils @Inject constructor(
     private val activity: Activity,
     private val sharedPreferences: SharedPreferences

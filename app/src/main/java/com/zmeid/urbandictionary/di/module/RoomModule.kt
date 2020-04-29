@@ -10,6 +10,9 @@ import dagger.Provides
 
 import javax.inject.Singleton
 
+/**
+ * Provides room related objects like [AppDatabase] and [UrbanDao].
+ */
 @Module
 class RoomModule {
     @Singleton

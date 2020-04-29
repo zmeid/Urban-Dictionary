@@ -31,7 +31,11 @@ import kotlinx.coroutines.*
 import timber.log.Timber
 import javax.inject.Inject
 
-
+/**
+ * [MainActivity] is the only activity of the application.
+ *
+ * View binding is enabled. Communicates with [MainActivityViewModel].
+ */
 class MainActivity : BaseActivity(), SearchViewOnQueryTextChangedListener, View.OnClickListener,
     DialogUtils.ChoiceClickedListener, SwipeRefreshLayout.OnRefreshListener {
 
@@ -45,7 +49,7 @@ class MainActivity : BaseActivity(), SearchViewOnQueryTextChangedListener, View.
     lateinit var urbanAdapter: UrbanAdapter
 
     @Inject
-    lateinit var apiErrorMessageGenerator: ApiErrorMessageGenerator
+    lateinit var errorMessageGenerator: ErrorMessageGenerator
 
     @Inject
     lateinit var dialogUtils: DialogUtils
@@ -71,9 +75,20 @@ class MainActivity : BaseActivity(), SearchViewOnQueryTextChangedListener, View.
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
+
+        binding.recyclerviewUrbanResults.layoutManager = layoutManager
+        binding.recyclerviewUrbanResults.adapter = urbanAdapter
+        setAdapterItemClickListener()
+
+        binding.buttonRetry.setOnClickListener(this)
+
+        binding.swipeRefreshLayout.setOnRefreshListener(this)
+
         mainActivityViewModel = ViewModelProvider(this, viewModelProviderFactory).get(MainActivityViewModel::class.java)
         observeUrbanDefinitionResult()
-        setAdapterItemClickListener()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -95,6 +110,9 @@ class MainActivity : BaseActivity(), SearchViewOnQueryTextChangedListener, View.
         }
     }
 
+    /**
+     * Observes if there are any changes in urbanDefinitionResult live data and calls [handleDefinitionResult]
+     */
     private fun observeUrbanDefinitionResult() {
         mainActivityViewModel.urbanDefinitionResult.observe(this, Observer {
             Timber.d("URBAN SEARCH RESPONSE: \n $it")
@@ -102,6 +120,13 @@ class MainActivity : BaseActivity(), SearchViewOnQueryTextChangedListener, View.
         })
     }
 
+    /**
+     * Handles definition results according to [ApiResponseWrapper]'s status.
+     *
+     * If [ApiResponseWrapper.Status.LOADING], it shows progress bar, hides user messages and hides retry button.
+     * If [ApiResponseWrapper.Status.SUCCESS], updates [UrbanAdapter] with received data, hides progress bar, hides user messages and hides retry button. If the received data is empty; shows a message to user.
+     * If [ApiResponseWrapper.Status.ERROR], it shows the error message and retry button. Clears recyclerview.
+     */
     private fun handleDefinitionResult(apiResponseWrapper: ApiResponseWrapper<UrbanApiResponseModel>) {
         when (apiResponseWrapper.status) {
             ApiResponseWrapper.Status.LOADING -> {
@@ -119,25 +144,12 @@ class MainActivity : BaseActivity(), SearchViewOnQueryTextChangedListener, View.
             }
             ApiResponseWrapper.Status.ERROR -> {
                 hideProgressBar(binding.progressBarMainActivity)
-                val errorMessage = apiErrorMessageGenerator.generateErrorMessage(apiResponseWrapper.exception!!)
+                val errorMessage = errorMessageGenerator.generateErrorMessage(apiResponseWrapper.exception!!)
                 urbanAdapter.submitList(null)
                 showUserMessage(errorMessage)
                 showRetryButton()
             }
         }
-    }
-
-    override fun initView() {
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        val view = binding.root
-        setContentView(view)
-
-        binding.recyclerviewUrbanResults.layoutManager = layoutManager
-        binding.recyclerviewUrbanResults.adapter = urbanAdapter
-
-        binding.buttonRetry.setOnClickListener(this)
-
-        binding.swipeRefreshLayout.setOnRefreshListener(this)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -156,15 +168,21 @@ class MainActivity : BaseActivity(), SearchViewOnQueryTextChangedListener, View.
         }
     }
 
+    /**
+     * Initializes search menu and sets [SearchViewOnQueryTextChangedListener].
+     */
     private fun initSearchMenu(menu: Menu) {
         searchViewMenuItem = menu.findItem(R.id.menu_search)
         searchViewMenu = searchViewMenuItem.actionView as SearchView
-        searchViewMenu.maxWidth = Integer.MAX_VALUE // THis is hack to solve close button wrong alignment
+        searchViewMenu.maxWidth = Integer.MAX_VALUE // This is hack to solve close button wrong alignment.
         observeUrbanLastSearchWord()
         searchViewMenu.queryHint = getString(R.string.search_view_query_hint)
         searchViewMenu.setOnQueryTextListener(this)
     }
 
+    /**
+     * If search view is not empty and the devices is rotated; it observes once to get last searched word.
+     */
     private fun observeUrbanLastSearchWord() {
         mainActivityViewModel.urbanLastSearchWord.observeOnce(this, Observer {
             searchViewMenuItem.expandActionView()
@@ -189,6 +207,9 @@ class MainActivity : BaseActivity(), SearchViewOnQueryTextChangedListener, View.
         return true
     }
 
+    /**
+     * Shows a message to user in the center of activity.
+     */
     private fun showUserMessage(message: String) {
         binding.textViewUserMessage.apply {
             text = message
@@ -218,18 +239,24 @@ class MainActivity : BaseActivity(), SearchViewOnQueryTextChangedListener, View.
 
     private fun showSortingPrefDialog() {
         sortingPrefDialog = dialogUtils.createSortingPrefDialog()
-        sortingPrefDialog?.show()
+        sortingPrefDialog!!.show()
     }
 
     override fun choiceClicked(shouldSortByThumbsUp: Boolean) {
         mainActivityViewModel.sortDefinitionResults(shouldSortByThumbsUp)
     }
 
+    /**
+     * Catches swap-to-refresh event.
+     */
     override fun onRefresh() {
         if (wordToSearch.isNotEmpty()) mainActivityViewModel.searchDefinition(wordToSearch, true)
         binding.swipeRefreshLayout.isRefreshing = false
     }
 
+    /**
+     * Catches clicks on share and play sound buttons.
+     */
     private fun setAdapterItemClickListener() {
         urbanAdapter.setOnItemClickedListener(object : OnItemClickListener {
             override fun onShareClicked(text: String) {
@@ -254,8 +281,14 @@ class MainActivity : BaseActivity(), SearchViewOnQueryTextChangedListener, View.
         })
     }
 
+    /**
+     * Sets the media URL for [simpleExoPlayer], makes sound player visible and plays the sound as stream in background. When playing sound is finished, sound player is invisible.
+     *
+     * If user pauses the player, in case of 3 seconds of in activity, player becomes invisible.
+     *
+     *  [simpleExoPlayer] should be released in [onDestroy].
+     */
     private fun playUrbanSound(url: String, resumeTime: Long) {
-
         binding.urbanPlayerControlView.player = simpleExoPlayer
         binding.urbanPlayerControlView.visibility = View.VISIBLE
         val mediaSource = ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(Uri.parse(url))
