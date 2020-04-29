@@ -24,6 +24,8 @@
 - Exo Media Player
 - Timber
 - Recyclerview
+- Mockito
+- Espresso
 
 # Some notes:
 
@@ -35,6 +37,8 @@
 - I use "Region - endRegion" to make code cleaner.
 - Almost all libraries/classes are injected by Dagger to classes.
 - Timber is configured with custom TimberLineNumberDebugTree which provides clickable logs to navigate developer to the point where log was generated.
+- I tried to document all classes and necessary methods with KDoc.
+- LeakCanary helped me a lot to catch memory leaks and correct memory usage. It shows notifications when LeakCanary's object watcher detects leaks.
 
 
 # Some scenarios:
@@ -45,7 +49,10 @@
   
   
 # Tests:
-- TBD
+- MainActivity Test(Instrumentation test)
+  - mainActivityPlaySoundTest(): Searches the letter 'b', plays the sound of the letter. Asserts that sound player is initialized and it is visible on the screen.
+- UrbanRepository Unit Test
+  - testGetDefinitions():  Tests [UrbanRepository.getDefinitions]. If forceRefresh is true, urban list from [urbanApiResponseModel] should be returned. Otherwise, [urbanListFromDatabase] should be returned.
 
 # Some example branches:
 I followed git workflow. All feature branches are created from develop branch and merged back to develop branch.
@@ -54,7 +61,6 @@ I followed git workflow. All feature branches are created from develop branch an
 - feature/sort-by-thumbs
 - feature/share-urban-and-play-urban-sound
 
-
 # Improve ideas:
 - Some words come with brackets. They can be linkified.
 - Implement crashlytic.
@@ -62,6 +68,7 @@ I followed git workflow. All feature branches are created from develop branch an
 - Create a common ProgressDialog and inject with dagger whereever needed.
 
 # Tasks before publishing the app:
+- Run full lint inspection(should be done before every commit).
 - Run static code analysis.
 - Enable ProGuard.
 - Use firebase test lab.
