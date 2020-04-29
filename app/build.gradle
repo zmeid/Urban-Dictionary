@@ -52,9 +52,12 @@ dependencies {
     // endregion
 
     // region Test
-    testImplementation "junit:junit:$junit_version"
+    testImplementation "org.mockito:mockito-core:$mockito_version"
+    testImplementation "org.mockito:mockito-inline:$mockito_version" // enables mocking final classes
     androidTestImplementation "androidx.test.ext:junit:$junit_ext_version"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
+    androidTestImplementation "com.android.support.test.espresso:espresso-contrib:$espresso_version" // has RecyclerViewActions
+    androidTestImplementation "androidx.test:rules:$test_rules_version"
     // endregion
 
     // region Dagger2
