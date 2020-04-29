@@ -21,14 +21,10 @@ import org.mockito.junit.MockitoJUnitRunner
 @RunWith(MockitoJUnitRunner::class)
 class UrbanRepositoryUnitTest {
 
-    @Mock
-    lateinit var urbanService: UrbanService
-    @Mock
-    lateinit var urbanDao: UrbanDao
-    @Mock
-    lateinit var urbanApiResponseModel: UrbanApiResponseModel
-    @Mock
-    lateinit var urbanListFromDatabase: List<Urban>
+    @Mock lateinit var urbanService: UrbanService
+    @Mock lateinit var urbanDao: UrbanDao
+    @Mock lateinit var urbanApiResponseModel: UrbanApiResponseModel
+    @Mock lateinit var urbanListFromDatabase: List<Urban>
     private val word = "Test"
 
     /**

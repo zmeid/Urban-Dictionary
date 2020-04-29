@@ -39,22 +39,14 @@ import javax.inject.Inject
 class MainActivity : BaseActivity(), SearchViewOnQueryTextChangedListener, View.OnClickListener,
     DialogUtils.ChoiceClickedListener, SwipeRefreshLayout.OnRefreshListener {
 
-    @Inject
-    lateinit var viewModelProviderFactory: ViewModelProvider.Factory
-    @Inject
-    lateinit var layoutManager: LinearLayoutManager
-    @Inject
-    lateinit var urbanAdapter: UrbanAdapter
-    @Inject
-    lateinit var errorMessageGenerator: ErrorMessageGenerator
-    @Inject
-    lateinit var dialogUtils: DialogUtils
-    @Inject
-    lateinit var shareTextIntent: Intent
-    @Inject
-    lateinit var dataSourceFactory: DefaultDataSourceFactory
-    @Inject
-    lateinit var simpleExoPlayer: SimpleExoPlayer
+    @Inject lateinit var viewModelProviderFactory: ViewModelProvider.Factory
+    @Inject lateinit var layoutManager: LinearLayoutManager
+    @Inject lateinit var urbanAdapter: UrbanAdapter
+    @Inject lateinit var errorMessageGenerator: ErrorMessageGenerator
+    @Inject lateinit var dialogUtils: DialogUtils
+    @Inject lateinit var shareTextIntent: Intent
+    @Inject lateinit var dataSourceFactory: DefaultDataSourceFactory
+    @Inject lateinit var simpleExoPlayer: SimpleExoPlayer
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var mainActivityViewModel: MainActivityViewModel
