@@ -6,9 +6,15 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.zmeid.urbandictionary.model.Urban
 
+/**
+ * [UrbanDao] is data access object which holds database queries.
+ */
 @Dao
 interface UrbanDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE) // in case of force reload, replace
+    /**
+     * We insert all definitions coming from API to the database. Since we have force refresh option with swap-to-refresh, it can create conflicts when we try to insert definitions which are already in the database. In this case, we replace old rows with new ones with [OnConflictStrategy.REPLACE] conflict strategy.
+     */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(urbanList: List<Urban>)
 
     @Query("SELECT * FROM urban where tag = :word")

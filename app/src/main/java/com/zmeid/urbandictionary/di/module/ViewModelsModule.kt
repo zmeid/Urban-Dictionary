@@ -8,7 +8,7 @@ import dagger.Module
 import dagger.multibindings.IntoMap
 
 /**
- * Enables dependency injection for viewModels.
+ * Enables dependency injection for viewModels. New viewmodels should be added here with related activity.
  */
 @Module
 abstract class ViewModelsModule {

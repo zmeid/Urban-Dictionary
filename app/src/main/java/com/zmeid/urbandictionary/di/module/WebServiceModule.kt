@@ -15,13 +15,12 @@ import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 /**
- * RetrofitModule is a module which is used inside RepositoryComponent.
+ * Provides web services related objects.
  */
 @Module
 class WebServiceModule {
-    //TODO surdaki herseyi apply ya cevir
     @Provides
-    fun provideOkHttpClient(
+    fun providesOkHttpClient(
         httpLoggingInterceptor: HttpLoggingInterceptor,
         headerInterceptor: Interceptor
     ): OkHttpClient =
@@ -31,13 +30,13 @@ class WebServiceModule {
             .build()
 
     @Provides
-    fun provideLoggingInterceptor(): HttpLoggingInterceptor =
+    fun providesLoggingInterceptor(): HttpLoggingInterceptor =
         HttpLoggingInterceptor().apply {
             level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
         }
 
     @Provides
-    fun provideHeaderInterceptor(): Interceptor = Interceptor { chain: Interceptor.Chain ->
+    fun providesHeaderInterceptor(): Interceptor = Interceptor { chain: Interceptor.Chain ->
         var request = chain.request()
         val headers = request.headers()
             .newBuilder()
@@ -50,26 +49,15 @@ class WebServiceModule {
         chain.proceed(request)
     }
 
-    /**
-     * Provides Singleton retrofit instance.
-     *
-     * @return Retrofit instance.
-     */
     @Singleton
     @Provides
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder().apply {
+    fun providesRetrofit(okHttpClient: OkHttpClient): Retrofit = Retrofit.Builder().apply {
         client(okHttpClient)
         baseUrl(BASE_URL)
         addConverterFactory(GsonConverterFactory.create())
     }.build()
 
-    /**
-     * Provides UrbanService
-     *
-     * @param retrofit instance to be used to create UrbanService.
-     * @return UrbanService.
-     */
     @Singleton
     @Provides
-    fun provideUrbanService(retrofit: Retrofit): UrbanService = retrofit.create(UrbanService::class.java)
+    fun providesUrbanService(retrofit: Retrofit): UrbanService = retrofit.create(UrbanService::class.java)
 }

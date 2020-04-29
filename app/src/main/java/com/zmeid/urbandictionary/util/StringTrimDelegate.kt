@@ -3,6 +3,9 @@ package com.zmeid.urbandictionary.util
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
+/**
+ * It trims the value whenever a new value is set to String.
+ */
 class StringTrimDelegate : ReadWriteProperty<Any?, String> {
 
     private var trimmedValue: String = ""
